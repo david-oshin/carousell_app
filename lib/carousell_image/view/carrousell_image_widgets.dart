@@ -272,8 +272,8 @@ class _AnimatedImageCaptionState extends State<AnimatedImageCaption>
   /// Modifica el valor de [_animationDuration] y de [_xDistance].
   void _calculateAnimation() {
     final captionLen = widget.imageCaption.length;
-    _animationDuration = (captionLen / 10).floor();
-    _xDistance = captionLen * 7;
+    _animationDuration = captionLen ~/ 9.82;
+    _xDistance = captionLen * 6.28;
   }
 
   /// Revisa si el [widget.imageCaption] puede caber en la pantalla.
