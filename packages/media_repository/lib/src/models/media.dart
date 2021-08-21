@@ -1,90 +1,82 @@
 part of './models.dart';
 
 /// La estructura del endpoint del recurso '/filtering/media'.
-/// 
-/// Esta clase es pura e inmutable, por lo tanto sus propiedades son 
-/// "read-only".
-class Media extends Equatable {
-  /// La longitud de [docs].
-  final int? limit;
-  /// El total de [docs] que tiene el API.
-  final int? total;
-  /// El número totales de paginaciones
-  final int? pages;
-  /// Los recursos que consumirá el usuario
-  final List<Docs> docs;
+class BaseMedia extends Equatable {
   /// La página actual de la paginación de [docs].
   final int? currentPage;
 
-  Media({
-    required this.limit,
-    required this.total,
-    required this.pages,
-    required this.docs,
+  /// Los recursos que consumirá el usuario
+  final List<Doc>? docs;
+
+  /// La longitud de [docs].
+  final int? limit;
+
+  /// El número totales de paginaciones
+  final int? pages;
+
+  /// El total de [docs] que tiene el API.
+  final int? total;
+
+  const BaseMedia._({
     required this.currentPage,
+    required this.docs,
+    required this.limit,
+    required this.pages,
+    required this.total,
   });
 
-  /// Devuelve una copia del objeto actual con los nuevos parámetros dados.
-  Media copyWith({
-    int? limit,
-    int? total,
-    int? pages,
-    List<Docs>? docs,
+  BaseMedia copyWith({
     int? currentPage,
-  }) {
-    return Media(
-      limit: limit ?? this.limit,
-      total: total ?? this.total,
-      pages: pages ?? this.pages,
-      docs: docs ?? this.docs,
-      currentPage: currentPage ?? this.currentPage,
-    );
-  }
+    List<Doc>? docs,
+    int? limit,
+    int? pages,
+    int? total,
+  }) =>
+      BaseMedia._(
+        currentPage: currentPage ?? this.currentPage,
+        docs: docs ?? this.docs,
+        limit: limit ?? this.limit,
+        pages: pages ?? this.pages,
+        total: total ?? this.total,
+      );
 
-  /// Convierte a un mapa el objeto actual.
-  Map<String, dynamic> toMap() {
-    return {
-      'limit': limit,
-      'total': total,
-      'pages': pages,
-      'docs': docs.map((x) => x.toMap()).toList(),
-      'currentPage': currentPage,
-    };
-  }
+  /// Convierte [source] a un objeto [BaseMedia].
+  ///
+  /// Asegúrate de que [source] tenga formato JSON.
+  factory BaseMedia._fromJson(String source) =>
+      BaseMedia._fromMap(json.decode(source));
 
-  /// Convirte [map] a un objeto [Media].
-  factory Media.fromMap(Map<String, dynamic> map) {
-    return Media(
-      limit: map['limit'],
-      total: map['total'],
-      pages: map['pages'],
-      docs: List<Docs>.from(map['docs']?.map((x) => Docs.fromMap(x))),
-      currentPage: map['currentPage'],
-    );
-  }
+  factory BaseMedia._fromMap(Map<String, dynamic> map) => BaseMedia._(
+        currentPage: map['current_page'],
+        docs: List<Doc>.from(map['docs']?.map((x) => Doc.fromMap(x))),
+        limit: map['limit'],
+        pages: map['pages'],
+        total: map['total'],
+      );
 
-  /// Convierte la clase actual a una String con formato JSON.
+  /// Convierte esto a un texto con formato JSON.
   String toJson() => json.encode(toMap());
 
-  /// Convierte [jsonResponse] a un objeto [Media].
-  factory Media.fromJson(String jsonResponse) => Media.fromMap(json.decode(jsonResponse));
+  /// Convierte esto a un `Map<String, dynamic>`.
+  Map<String, dynamic> toMap() => {
+        'current_page': currentPage,
+        'docs': docs?.map((x) => x.toMap()).toList(),
+        'limit': limit,
+        'pages': pages,
+        'total': total,
+      };
 
   @override
-  bool get stringify => true;
-
-  @override
-  List<Object?> get props {
-    return [
-      limit,
-      total,
-      pages,
-      docs,
-      currentPage,
-    ];
-  }
+  List<Object?> get props => [
+        currentPage,
+        docs,
+        limit,
+        pages,
+        total,
+      ];
 }
 
-class Docs extends Equatable {
+class Doc extends Equatable {
   final bool? youLikedThis;
   final String? type;
   final int? userId;
@@ -102,9 +94,11 @@ class Docs extends Equatable {
   final bool? thisProfileFollowsYou;
   final bool? thisProfileIsSubscribedToYou;
   final bool? isPaid;
-  final int? price;
+  final double? price;
+  final int? likes;
+  final List<Comment>? comments;
 
-  Docs({
+  Doc({
     this.youLikedThis,
     this.type,
     this.userId,
@@ -123,9 +117,11 @@ class Docs extends Equatable {
     this.thisProfileIsSubscribedToYou,
     this.isPaid,
     this.price,
+    this.likes,
+    this.comments,
   });
 
-  Docs copyWith({
+  Doc copyWith({
     bool? youLikedThis,
     String? type,
     int? userId,
@@ -143,120 +139,184 @@ class Docs extends Equatable {
     bool? thisProfileFollowsYou,
     bool? thisProfileIsSubscribedToYou,
     bool? isPaid,
-    int? price,
-  }) {
-    return Docs(
-      youLikedThis: youLikedThis ?? this.youLikedThis,
-      type: type ?? this.type,
-      userId: userId ?? this.userId,
-      youBoughtThis: youBoughtThis ?? this.youBoughtThis,
-      youFollowThisProfile: youFollowThisProfile ?? this.youFollowThisProfile,
-      duration: duration ?? this.duration,
-      thumbnail: thumbnail ?? this.thumbnail,
-      visibility: visibility ?? this.visibility,
-      youHaveThisProfileInFavorites:
-          youHaveThisProfileInFavorites ?? this.youHaveThisProfileInFavorites,
-      id: id ?? this.id,
-      youAreSubscribedToThisProfile:
-          youAreSubscribedToThisProfile ?? this.youAreSubscribedToThisProfile,
-      youCommentedThis: youCommentedThis ?? this.youCommentedThis,
-      thisProfileHasYouInFavorites:
-          thisProfileHasYouInFavorites ?? this.thisProfileHasYouInFavorites,
-      youSavedThis: youSavedThis ?? this.youSavedThis,
-      thisProfileFollowsYou:
-          thisProfileFollowsYou ?? this.thisProfileFollowsYou,
-      thisProfileIsSubscribedToYou:
-          thisProfileIsSubscribedToYou ?? this.thisProfileIsSubscribedToYou,
-      isPaid: isPaid ?? this.isPaid,
-      price: price ?? this.price,
-    );
-  }
+    double? price,
+    int? likes,
+    List<Comment>? comments,
+  }) =>
+      Doc(
+          youLikedThis: youLikedThis ?? this.youLikedThis,
+          type: type ?? this.type,
+          userId: userId ?? this.userId,
+          youBoughtThis: youBoughtThis ?? this.youBoughtThis,
+          youFollowThisProfile:
+              youFollowThisProfile ?? this.youFollowThisProfile,
+          duration: duration ?? this.duration,
+          thumbnail: thumbnail ?? this.thumbnail,
+          visibility: visibility ?? this.visibility,
+          youHaveThisProfileInFavorites: youHaveThisProfileInFavorites ??
+              this.youHaveThisProfileInFavorites,
+          id: id ?? this.id,
+          youAreSubscribedToThisProfile: youAreSubscribedToThisProfile ??
+              this.youAreSubscribedToThisProfile,
+          youCommentedThis: youCommentedThis ?? this.youCommentedThis,
+          thisProfileHasYouInFavorites:
+              thisProfileHasYouInFavorites ?? this.thisProfileHasYouInFavorites,
+          youSavedThis: youSavedThis ?? this.youSavedThis,
+          thisProfileFollowsYou:
+              thisProfileFollowsYou ?? this.thisProfileFollowsYou,
+          thisProfileIsSubscribedToYou:
+              thisProfileIsSubscribedToYou ?? this.thisProfileIsSubscribedToYou,
+          isPaid: isPaid ?? this.isPaid,
+          price: price ?? this.price,
+          likes: likes ?? this.likes,
+          comments: comments ?? this.comments);
 
-  Map<String, dynamic> toMap() {
-    return {
-      'youLikedThis': youLikedThis,
-      'type': type,
-      'userId': userId,
-      'youBoughtThis': youBoughtThis,
-      'youFollowThisProfile': youFollowThisProfile,
-      'duration': duration,
-      'thumbnail': thumbnail,
-      'visibility': visibility,
-      'youHaveThisProfileInFavorites': youHaveThisProfileInFavorites,
-      'id': id,
-      'youAreSubscribedToThisProfile': youAreSubscribedToThisProfile,
-      'youCommentedThis': youCommentedThis,
-      'thisProfileHasYouInFavorites': thisProfileHasYouInFavorites,
-      'youSavedThis': youSavedThis,
-      'thisProfileFollowsYou': thisProfileFollowsYou,
-      'thisProfileIsSubscribedToYou': thisProfileIsSubscribedToYou,
-      'isPaid': isPaid,
-      'price': price,
-    };
-  }
+  factory Doc.empty() => Doc();
 
-  factory Docs.fromMap(Map<String, dynamic> map) {
-    return Docs(
-      youLikedThis: map['youLikedThis'],
-      type: map['type'],
-      userId: map['userId'],
-      youBoughtThis: map['youBoughtThis'],
-      youFollowThisProfile: map['youFollowThisProfile'],
-      duration: map['duration'],
-      thumbnail: map['thumbnail'],
-      visibility: map['visibility'],
-      youHaveThisProfileInFavorites: map['youHaveThisProfileInFavorites'],
-      id: map['id'],
-      youAreSubscribedToThisProfile: map['youAreSubscribedToThisProfile'],
-      youCommentedThis: map['youCommentedThis'],
-      thisProfileHasYouInFavorites: map['thisProfileHasYouInFavorites'],
-      youSavedThis: map['youSavedThis'],
-      thisProfileFollowsYou: map['thisProfileFollowsYou'],
-      thisProfileIsSubscribedToYou: map['thisProfileIsSubscribedToYou'],
-      isPaid: map['isPaid'],
-      price: map['price'],
-    );
-  }
+  Map<String, dynamic> toMap() => {
+        'you_liked_this': youLikedThis,
+        'type': type,
+        'user_id': userId,
+        'you_bought_this': youBoughtThis,
+        'you_follow_this_profile': youFollowThisProfile,
+        'duration': duration,
+        'thumbnail': thumbnail,
+        'visibility': visibility,
+        'you_have_this_profile_in_favorites': youHaveThisProfileInFavorites,
+        'id': id,
+        'you_are_subscribed_to_this_profile': youAreSubscribedToThisProfile,
+        'you_commented_this': youCommentedThis,
+        'this_profile_has_you_in_favorites': thisProfileHasYouInFavorites,
+        'you_saved_this': youSavedThis,
+        'this_profile_follows_you': thisProfileFollowsYou,
+        'this_profile_is_subscribed_to_you': thisProfileIsSubscribedToYou,
+        'is_paid': isPaid,
+        'price': price,
+        'likes': likes,
+        'comments': comments?.map((x) => x.toMap()).toList(),
+      };
+
+  factory Doc.fromMap(Map<String, dynamic> map) => Doc(
+        youLikedThis: map['you_liked_this'],
+        type: map['type'],
+        userId: map['user_id'],
+        youBoughtThis: map['you_bought_this'],
+        youFollowThisProfile: map['you_follow_this_profile'],
+        duration: map['duration'],
+        thumbnail: map['thumbnail'],
+        visibility: map['visibility'],
+        youHaveThisProfileInFavorites:
+            map['you_have_this_profile_in_favorites'],
+        id: map['id'],
+        youAreSubscribedToThisProfile:
+            map['you_are_subscribed_to_this_profile'],
+        youCommentedThis: map['you_commented_this'],
+        thisProfileHasYouInFavorites: map['this_profile_has_you_in_favorites'],
+        youSavedThis: map['you_saved_this'],
+        thisProfileFollowsYou: map['this_profile_follows_you'],
+        thisProfileIsSubscribedToYou: map['this_profile_is_subscribed_to_you'],
+        isPaid: map['is_paid'],
+        price: map['price'],
+        likes: map['likes'],
+        comments: map['comments'],
+      );
 
   String toJson() => json.encode(toMap());
 
-  factory Docs.fromJson(String source) => Docs.fromMap(json.decode(source));
+  factory Doc.fromJson(String source) => Doc.fromMap(json.decode(source));
 
   @override
-  bool get stringify => true;
+  List<Object?> get props => [
+        youLikedThis,
+        type,
+        userId,
+        youBoughtThis,
+        youFollowThisProfile,
+        duration,
+        thumbnail,
+        visibility,
+        youHaveThisProfileInFavorites,
+        id,
+        youAreSubscribedToThisProfile,
+        youCommentedThis,
+        thisProfileHasYouInFavorites,
+        youSavedThis,
+        thisProfileFollowsYou,
+        thisProfileIsSubscribedToYou,
+        isPaid,
+        price,
+        likes,
+        comments
+      ];
+}
+
+class Comment extends Equatable {
+  final int? id;
+  final String? comment;
+  final String? avatarUrl;
+  final String? fullName;
+
+  Comment._({
+    required this.id,
+    required this.comment,
+    required this.avatarUrl,
+    required this.fullName,
+  });
+
+  Comment copyWith({
+    int? id,
+    String? comment,
+    String? avatarUrl,
+    String? fullName,
+  }) =>
+      Comment._(
+        id: id ?? this.id,
+        comment: comment ?? this.comment,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+        fullName: fullName ?? this.fullName,
+      );
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'avatarUrl': avatarUrl,
+        'fullName': fullName,
+        'comment': comment,
+      };
+
+  factory Comment.fromMap(Map<String, dynamic> map) => Comment._(
+        id: map['id'],
+        comment: map['comment'],
+        fullName: map['fullName'],
+        avatarUrl: map['avatarUrl'],
+      );
+
+  String toJson() => json.encode(toMap());
+
+  factory Comment.fromJson(String source) =>
+      Comment.fromMap(json.decode(source));
 
   @override
-  List<Object?> get props {
-    return [
-      youLikedThis,
-      type,
-      userId,
-      youBoughtThis,
-      youFollowThisProfile,
-      duration,
-      thumbnail,
-      visibility,
-      youHaveThisProfileInFavorites,
-      id,
-      youAreSubscribedToThisProfile,
-      youCommentedThis,
-      thisProfileHasYouInFavorites,
-      youSavedThis,
-      thisProfileFollowsYou,
-      thisProfileIsSubscribedToYou,
-      isPaid,
-      price,
-    ];
-  }
+  List<Object?> get props => [id, comment, fullName, avatarUrl];
 }
 
-/// El tipo de [Media].
-enum MediaType { image, video, audio }
+class Media extends Equatable {
+  final TypeOfMedia type;
+  final BaseMedia baseMedia;
 
-/// Métodos que se puede ejecutar sobre el [MediaType].
-extension MediaTypeMethods on MediaType {
-  /// Retorna el [MediaType] elegido como un `Stirng`.
-  String get name => this.toString().split('.')[1];
+  const Media._({
+    required this.type,
+    required this.baseMedia,
+  });
+
+  factory Media.fromJson(TypeOfMedia type, String source) =>
+      Media.fromMap(type, json.decode(source));
+
+  factory Media.fromMap(TypeOfMedia type, Map<String, dynamic> map) =>
+      Media._(type: type, baseMedia: BaseMedia._fromMap(map));
+
+  Media copyWith({TypeOfMedia? type, BaseMedia? baseMedia}) =>
+      Media._(type: type ?? this.type, baseMedia: baseMedia ?? this.baseMedia);
+
+  @override
+  List<Object?> get props => [type, baseMedia];
 }
-
-/// Documentar [Docs]
